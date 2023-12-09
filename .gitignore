@@ -1,0 +1,5 @@
+# Ignore the "Output Images" folder
+Output Images/
+
+# Ignore the "Sign_language.pkl" file
+Sign_language.pkl
