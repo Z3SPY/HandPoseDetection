@@ -17,7 +17,9 @@ from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.metrics import accuracy_score # Calculates Accuracy
 import pickle # Save their models down to disks
 
-
+from sklearn import tree
+from sklearn.tree import DecisionTreeClassifier
+import matplotlib.pyplot as plt
 
 # TRAINING SET UP
 mp_drawing = mp.solutions.drawing_utils
@@ -36,7 +38,7 @@ ButtonWidth = 100
 ButtonHeight = 50
 canClick = False
 count = 0
-classname = "FazeUP" # Change This per Gesture
+classname = "J" # Change This per Gesture
 
 #Setting Up Features and Classes
 x = df.drop("Class", axis=1) # Every Value Except Our class column
@@ -46,7 +48,7 @@ X_train, X_test, Y_train, Y_test = train_test_split(x, y, test_size=0.3, random_
 # Training the model/ Separate Machine learning algorithms
 # Dicstionary of Pipelines
 pipelines = {
-  'lr':make_pipeline(StandardScaler(), LogisticRegression()),
+  'lr':make_pipeline(StandardScaler(), LogisticRegression(max_iter=2000)),
   'rc':make_pipeline(StandardScaler(), RidgeClassifier()),
   'rf':make_pipeline(StandardScaler(), RandomForestClassifier()),
   'gb':make_pipeline(StandardScaler(), GradientBoostingClassifier()),
@@ -68,6 +70,13 @@ with open('sign_language.pkl', 'wb') as f:
   pickle.dump(fit_models['lr'],f)
 
 
+#Test Tree
+clf = DecisionTreeClassifier()
+clf.fit(X_train, Y_train)
+#print(tree.export_text(clf))
+fig  = plt.figure(figsize=(100,60))
+tree.plot_tree(clf, feature_names=X_train.columns, class_names=clf.classes_, filled=True)
+fig.savefig("decision_tree.png")
 
 # TRAINING SET UP END
 
@@ -92,7 +101,7 @@ def mouse_callback(event, x, y, flags, param):
     global count
     if event == cv2.EVENT_LBUTTONDOWN:
         if button.can_click == True and button.x < x < button.x + button.width and button.y < y < button.y + button.height:
-            print(f"Mouse clicked at position ({x}, {y})")
+            #print(f"Mouse clicked at position ({x}, {y})")
 
             lm_row = [classname]
             for index, lm in enumerate(mp_hands.HandLandmark):
@@ -250,7 +259,7 @@ with mp_hands.Hands(
           # Make Detections
           body_language_class = model.predict(X)[0]
           body_language_prob = model.predict_proba(X)[0]
-          print(body_language_class, body_language_prob)
+          #print(body_language_class, body_language_prob)
 
 
           #Grab Coord
